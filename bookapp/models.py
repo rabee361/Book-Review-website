@@ -12,6 +12,7 @@ class Genre(models.Model):
 
 class Author(models.Model):
     name = models.CharField(max_length=100  ,db_index=True)
+    # about = models.TextField()
     image = models.ImageField(upload_to='media/authors/' , null=True , default='None')
 
     def __str__(self):
