@@ -25,10 +25,18 @@ class Quote(models.Model):
         return f'{self.text[:50]}...'
 
 
+
 class Book(models.Model):
+    LANGUAGES = (
+        ('en' , 'English'),
+        ('ar' , 'Arabic')
+    )
     name = models.CharField(max_length=150 , db_index=True)
     cover = models.ImageField(upload_to='covres/')
     author = models.ManyToManyField(Author)
+    pages = models.IntegerField(default=250)
+    language = models.CharField(max_length=30,choices=LANGUAGES , default='en')
+    # publish_date = models.DateField(auto_now_add=True)
     genre = models.ManyToManyField(Genre)
     file = models.FileField(upload_to='books/')
     quotes = models.ManyToManyField(Quote)
