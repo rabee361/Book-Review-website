@@ -20,23 +20,31 @@ class QuoteSerialzier(serializers.ModelSerializer):
         fields = ['text']
 
     #-----to return value without keys----#
-    # def to_representation(self, instance): 
-    #     representation = super().to_representation(instance)
-    #     return list(representation.values())
+    def to_representation(self, instance): 
+        representation = super().to_representation(instance)
+        return representation['text']
+
+class GenreSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Genre
+        fields = ['name']
+
+    #-----to return the values as a list----#
+    def to_representation(self, instance): 
+        representation = super().to_representation(instance)
+        return representation['name']
+    
 
 
 class BookSerializer(serializers.ModelSerializer):
     author = AuthorSerializer(many=True,read_only=True)
     quotes = QuoteSerialzier(many=True,read_only=True)
-
+    genre = GenreSerializer(many=True , read_only=True)
     class Meta:
         model = Book
-        fields  = ['name','author','cover','file','quotes']
+        fields  = ['name','author','cover','file','quotes','genre']
 
-    
-class GenreSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Genre
-        fields = ['name']
+
+
 
 
