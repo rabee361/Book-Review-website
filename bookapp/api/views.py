@@ -2,14 +2,13 @@ from rest_framework.response import Response
 from bookapp.models import Book , Review , Author , Genre
 from rest_framework.views import APIView
 from .serializers import BookSerializer , ReviewSerializer , AuthorSerializer , GenreSerializer , UserSerializer ,MessageSerializer
-from rest_framework.generics import ListAPIView , RetrieveAPIView , UpdateAPIView , CreateAPIView
+from rest_framework.generics import ListAPIView , RetrieveAPIView , CreateAPIView  ,ListCreateAPIView
 from bookapp.filters import BookFilter
 from django_filters.rest_framework import DjangoFilterBackend
 from django.db.models import Q
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.pagination import PageNumberPagination
 from rest_framework import status
-from django.contrib.auth.models import User
 from django.contrib.auth import login , logout , authenticate
 from django.shortcuts import redirect
 
@@ -30,6 +29,7 @@ class GetBooks(ListAPIView):
 class GetBook(RetrieveAPIView):
     queryset = Book.objects.prefetch_related('author','genre','quotes').all()
     serializer_class = BookSerializer
+
 
 
 #----get all genres----#
@@ -66,7 +66,6 @@ class RelatedBooks2(RetrieveAPIView):
     
     def get(self,request,pk):
         self.object = self.get_object()
-        book = Book.objects.prefetch_related('author','quotes','genre').get(id=pk)
         genres = [i.name for i in self.object.genre.all()]
         books = Book.objects.prefetch_related('author','quotes','genre')\
                             .filter(Q(genre__name__in=genres))\
@@ -118,3 +117,16 @@ class Logout(APIView):
 class WriteMessage(CreateAPIView):
     serializer_class = MessageSerializer
     permission_classes = [IsAuthenticated]
+
+
+
+class BookReviews(ListCreateAPIView):
+    queryset = Review.objects.all()
+    serializer_class = ReviewSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get(self,request,pk):
+        reviews = Review.objects.select_related('book','user').filter(book__id=pk)
+        serializer = self.get_serializer(reviews,many=True)
+        return Response(serializer.data , status=status.HTTP_200_OK)
+

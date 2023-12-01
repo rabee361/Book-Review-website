@@ -6,11 +6,6 @@ from rest_framework import status
 from rest_framework.response import Response
 
 
-class ReviewSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Review
-        fields = '__all__'
-
 
    
 class AuthorSerializer(serializers.ModelSerializer):
@@ -56,6 +51,9 @@ class BookSerializer(serializers.ModelSerializer):
         model = Book
         fields  = ['name','author','cover','file','quotes','genre','language','pages']
 
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        return representation['name']
 
 
 
@@ -100,17 +98,20 @@ class MessageSerializer(serializers.ModelSerializer):
 
 
 
+class ReviewSerializer(serializers.ModelSerializer):
+    user = UserSerializer(many=False,read_only=True)
+    book = BookSerializer(many=False,read_only=True)
+    book_name = serializers.CharField(write_only=True)
+    class Meta:
+        model = Review
+        fields = ['user','book','book_name','fav_quote','text','stars']
 
-# class ReviewSerializer(serializers.ModelSerializer):
-#     user = UserSerializer(many=False,read_only=True)
-#     book = BookSerializer(many=False,read_only=True)
-#     class Meta:
-#         model = Review
-#         fields = ['user','book','fav_quote','text','stars']
+    def create(self, validated_data):
+        request = self.context.get('request')
+        book_name = validated_data.pop('book_name')
+        book = Book.objects.get(name=book_name)
+        review = Review.objects.create(user=request.user,book=book , **validated_data)
+        review.save()
+        return review
+    
 
-#     def create(self, validated_data):
-#         request = self.context.get('request')
-#         review = Review.objects.create_user(**validated_data)
-#         review.user = request.user
-#         review.save()
-#         return review

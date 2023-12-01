@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import GetBooks , GetBook , GetGenres , GetAuthor , RelatedBooks2 , SignUp2 , Login , Logout , WriteMessage
+from .views import GetBooks , GetBook , GetGenres , GetAuthor , RelatedBooks2 , SignUp2 , Login, BookReviews , Logout , WriteMessage
 
 urlpatterns = [
     path('all_books/' , GetBooks.as_view() , name="books"),
@@ -10,5 +10,6 @@ urlpatterns = [
     path('sign_up/', SignUp2.as_view() , name="sign_up"),
     path('login/' , Login.as_view() , name="login"),
     path('logout/' , Logout.as_view() , name="logout"),
-    path('message/' , WriteMessage.as_view() , name="message")
+    path('message/' , WriteMessage.as_view() , name="message"),
+    path('review/<str:pk>' , BookReviews.as_view() , name="review")
 ]
