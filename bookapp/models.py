@@ -33,6 +33,7 @@ class Book(models.Model):
         ('ar' , 'Arabic')
     )
     name = models.CharField(max_length=150 , db_index=True)
+    story = models.TextField(max_length=300 ,default="n")
     cover = models.ImageField(upload_to='covres/')
     author = models.ManyToManyField(Author)
     pages = models.IntegerField(default=250)
