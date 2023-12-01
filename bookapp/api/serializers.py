@@ -4,6 +4,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth import login
 from rest_framework import status
 from rest_framework.response import Response
+from django.contrib.auth.password_validation import validate_password
 
 
 
@@ -58,6 +59,7 @@ class BookSerializer(serializers.ModelSerializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(write_only=True, validators=[validate_password])
     password2 = serializers.CharField(style={'input_type': 'password'}, write_only=True)
     class Meta:
         model = User
@@ -66,6 +68,7 @@ class UserSerializer(serializers.ModelSerializer):
     def validate(self, data):
         if data['password'] != data['password2']:
             return serializers.ValidationError("passwords don't match")
+        validate_password(data['password'])
         return data
     
     def create(self, validated_data):
@@ -77,9 +80,9 @@ class UserSerializer(serializers.ModelSerializer):
         login(request,user)
         return user
     
-    def to_representation(self, instance):
-        representation = super().to_representation(instance)
-        return representation['username']
+    # def to_representation(self, instance):
+    #     representation = super().to_representation(instance)
+    #     return representation['username']
 
 
 
